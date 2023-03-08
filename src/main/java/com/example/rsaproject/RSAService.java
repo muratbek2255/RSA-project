@@ -2,14 +2,21 @@ package com.example.rsaproject;
 
 import com.example.rsaproject.io.ByteArrayReader;
 import com.example.rsaproject.io.ByteArrayWriter;
+import jakarta.xml.bind.DatatypeConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+
 import javax.crypto.Cipher;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
+import java.util.Base64;
 import java.util.HashMap;
 
 
@@ -19,8 +26,8 @@ public class RSAService {
     String transformation="RSA";
 
 
-    static Path privateKeyFile;
-    static Path publicKeyFile;
+    static FileOutputStream privateKeyFile;
+    static FileOutputStream publicKeyFile;
 
     public byte[] encrypt(PublicKey spec, byte[] plainText) {
 
@@ -54,33 +61,32 @@ public class RSAService {
         return null;
     }
 
-    public void insertIntoFile() {
+    public void insertIntoFile() throws IOException {
 
         KeyPair keyPair = new RSAUtils().produce();
 
-        privateKeyFile = Paths.get("./RsaPrivate.key");
-        publicKeyFile = Paths.get("./RsaPublic.key");
+        privateKeyFile = new FileOutputStream("RsaPrivate" + ".key");
+        privateKeyFile.write(keyPair.getPrivate().getEncoded());
+        privateKeyFile.close();
 
-        ByteArrayWriter writer = new ByteArrayWriter(privateKeyFile);
-        writer.write(keyPair.getPrivate().getEncoded());
-
-        ByteArrayWriter writer2 = new ByteArrayWriter(publicKeyFile);
-        writer.write(keyPair.getPublic().getEncoded());
+        publicKeyFile = new FileOutputStream("RsaPublic" + ".pub");
+        publicKeyFile.write(keyPair.getPublic().getEncoded());
+        publicKeyFile.close();
     }
 
-    public HashMap<String, HashMap<String, String>> encryptService(RSARequest rsaRequest){
+    public HashMap<String, HashMap<String, String>> encryptService(RSARequest rsaRequest) throws IOException {
 
-        privateKeyFile = Paths.get("./RsaPrivate.key");
-        publicKeyFile = Paths.get("./RsaPublic.key");
+        Path privateKeyFile1 = Paths.get("./RsaPrivate.key");
+        Path publicKeyFile1 = Paths.get("./RsaPublic.pub");
 
         PrivateKey privateKey
                 = new RSAUtils().PrivateKeyProduce(
-                new ByteArrayReader(privateKeyFile).read()
+                Files.readAllBytes(privateKeyFile1)
         );
 
         PublicKey publicKey
                 = new RSAUtils().PublicKeyProduce(
-                new ByteArrayReader(publicKeyFile).read()
+                Files.readAllBytes(publicKeyFile1)
         );
 
         String password = rsaRequest.getPassword();

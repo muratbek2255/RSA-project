@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -27,7 +28,7 @@ public class RsaController {
     }
 
     @GetMapping("/file")
-    public void insertIntoFile() {
+    public void insertIntoFile() throws IOException {
         rsaService.insertIntoFile();
     }
 
@@ -36,5 +37,4 @@ public class RsaController {
             throws NoSuchAlgorithmException, IOException {
         return ResponseEntity.status(201).body(rsaService.encryptService(rsaRequest));
     }
-
 }

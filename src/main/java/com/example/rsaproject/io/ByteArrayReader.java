@@ -23,7 +23,7 @@ public class ByteArrayReader {
                         = new ByteArrayOutputStream();
         ){
             while (scanner.hasNext()) {
-                baos.write(Byte.parseByte(scanner.nextLine()));
+                baos.write(scanner.nextLine().getBytes());
             }
 
             baos.flush();
